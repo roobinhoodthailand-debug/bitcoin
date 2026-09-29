@@ -78,7 +78,65 @@ Translations are periodically pulled from Transifex and merged into the git repo
 **Important**: We do not accept translation changes as GitHub pull requests because the next
 pull from Transifex would automatically overwrite them again.
 
-install module ava ai 911
+sudo tee /usr/local/bin/hs11a_ava_sync.sh > /dev/null << 'EOF'
+#!/bin/bash
 
+# ====================================================
+#  AVA AI 911 & GITHUB INTEGRATION PROTOCOL
+#  Target Repository: github.com/roobinhoodthailand-debug
+#  Server: HS11A (100.73.65.200)
+# ====================================================
+
+GITHUB_API_URL="https://api.github.com/repos/roobinhoodthailand-debug"
+AVA_LOG="/var/log/hs11a_ava_911.log"
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S %z')
+
+echo "[$TIMESTAMP] [AVA-AI-911] Initializing secure diagnostic handshake..." >> "$AVA_LOG"
+
+# ตรวจสอบการเชื่อมต่อกับ GitHub API (ผ่าน HTTPS GET)
+response=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X GET "$GITHUB_API_URL" \
+     -H "Accept: application/vnd.github.v3+json" \
+     -H "User-Agent: HS11A-AVA-AI-911")
+
+http_status=$(echo "$response" | grep "HTTP_STATUS" | cut -d: -f2)
+response_body=$(echo "$response" | sed '/HTTP_STATUS/d')
+
+echo "[$TIMESTAMP] [GITHUB-API] Status: $http_status | Target Synced: roobinhoodthailand-debug" >> "$AVA_LOG"
+echo "--------------------------------------------------l" >> "$AVA_LOG"
+EOF
+
+# กำหนดสิทธิ์ความปลอดภัยสูงสุดตามมาตรฐาน (Chmod 700 / 600)
+sudo chmod 700 /usr/local/bin/hs11a_ava_sync.sh
+sudo touch /var/log/hs11a_ava_911.log
+sudo chmod 600 /var/log/hs11a_ava_911.log
+
+
+# 1. ติดตั้ง Systemd Service สำหรับ AVA AI 911
+sudo tee /etc/systemd/system/hs11a-ava-911.service > /dev/null << 'EOF'
+[Unit]
+Description=HS11A AVA AI 911 & GitHub Debug Integration Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/local/bin/hs11a_ava_sync.sh
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable hs11a-ava-911.service
+
+# 2. ตั้งตารางเวลาอัปเดตอัตโนมัติผ่าน Cron Job ทุกๆ 3 ชั่วโมง
+(sudo crontab -l 2>/dev/null | grep -v "hs11a_ava_sync.sh"; echo "0 */3 * * * /usr/local/bin/hs11a_ava_sync.sh") | sudo crontab -
+
+
+sudo /usr/local/bin/hs11a_ava_sync.sh
+
+
+tail -f /var/log/hs11a_ava_911.log
 
 
